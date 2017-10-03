@@ -1,0 +1,17 @@
+{
+  "name": "parser",
+  "version": "1.0.0",
+  "description": "for installation: npm install guid eol xlsx jsonfile --save",
+  "main": "parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "eol": "^0.9.1",
+    "guid": "0.0.12",
+    "jsonfile": "^4.0.0",
+    "xlsx": "^0.11.5"
+  }
+}
