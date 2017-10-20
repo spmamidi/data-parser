@@ -9,7 +9,7 @@ function isValidNumber(number) {
 var ids = {};
 var errors = [];
 
-var argFile = process.argv.slice(2)[0] || "sample.xlsx";
+var argFile = process.argv.slice(2)[0] || "USBE_State_MSP_ Award_Template_10._19.xlsx";
 
 
 var workbook = XLSX.readFile(argFile);
@@ -73,7 +73,7 @@ function parseMatrix(boundaries, configuration, workSheet) {
             if (mainValue) {
                 var entity = {};
                 entity[configuration.output.name] = mainValue;
-                configuration.output.properties.forEach(property=>{
+                configuration.output.properties.forEach(property => {
                     var propColumn = property.columnName === "=" ? column : getIndexFromColumn(property.columnName);
                     var propRow = property.row === "=" ? row : property.row;
                     entity[property.name] = resolveValue(propRow, propColumn, workSheet);
@@ -82,12 +82,12 @@ function parseMatrix(boundaries, configuration, workSheet) {
             }
         });
     });
-   return results;
+    return results;
 }
 
 function resolveValue(row, column, workSheet) {
     var columnName = getColumnFromIndex(column);
-    
+
     var value = workSheet[columnName + row] && workSheet[columnName + row].v || '';
     return value;
 }
@@ -115,7 +115,7 @@ var configSettings = {
         name: "fundingAmount",
         start: {
             columnName: "D",
-            row: "5"
+            row: "4"
         },
         end: {
             columnName: "~",
@@ -123,7 +123,7 @@ var configSettings = {
         },
         properties: [{
             name: "recipientId",
-            columnName: "A",
+            columnName: "B",
             row: "="
         },
         {
@@ -132,8 +132,19 @@ var configSettings = {
             row: "2"
         },
         {
+            name: "programComment",
+            columnName: "=",
+            row: "1"
+        },
+
+        {
+            name: "recipientComment",
+            columnName: "A",
+            row: "="
+        },
+        {
             name: "programName",
-            columnName: "B",
+            columnName: "C",
             row: "="
         }
 
@@ -143,26 +154,29 @@ var configSettings = {
 
 //started processing
 var fundings = workbook.SheetNames.map((sheetName) => {
-    var workSheet = workbook.Sheets[sheetName];
-    var rawJson = XLSX.utils.sheet_to_json(workSheet);
-    var sheetBoundaries = workSheet['!ref'].split(":");
+    if (sheetName && sheetName.toLowerCase() === "award") {
 
-    var boundaries = {
-        start: {
-            row: sheetBoundaries[0].replace(/[A-Z]/g, ""),
-            columnName: sheetBoundaries[0].replace(/[0-9]/g, ""),
-            column: getIndexFromColumn(sheetBoundaries[0].replace(/[0-9]/g, ""))
-        },
-        end: {
 
-            row: sheetBoundaries[1].replace(/[A-Z]/g, ""),
-            columnName: sheetBoundaries[1].replace(/[0-9]/g, ""),
-            column: getIndexFromColumn(sheetBoundaries[1].replace(/[0-9]/g, ""))
+        var workSheet = workbook.Sheets[sheetName];
+        var rawJson = XLSX.utils.sheet_to_json(workSheet);
+        var sheetBoundaries = workSheet['!ref'].split(":");
 
-        }
-    };
-    return parseSheet(sheetName, boundaries,configSettings, workSheet );
+        var boundaries = {
+            start: {
+                row: sheetBoundaries[0].replace(/[A-Z]/g, ""),
+                columnName: sheetBoundaries[0].replace(/[0-9]/g, ""),
+                column: getIndexFromColumn(sheetBoundaries[0].replace(/[0-9]/g, ""))
+            },
+            end: {
 
+                row: sheetBoundaries[1].replace(/[A-Z]/g, ""),
+                columnName: sheetBoundaries[1].replace(/[0-9]/g, ""),
+                column: getIndexFromColumn(sheetBoundaries[1].replace(/[0-9]/g, ""))
+
+            }
+        };
+        return parseSheet(sheetName, boundaries, configSettings, workSheet);
+    }
 });
 
 
